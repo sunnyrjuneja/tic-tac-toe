@@ -1,28 +1,43 @@
 <html>  
   <head>  
-    <title>Canvas tutorial</title>  
+    <title>Tic-Tac-Toe</title>  
     <script type="text/javascript">  
       function main() {
         var x = 30;
         var y = 30;
-        var player = ["red", "blue"]
 
-        var board = new Array(3);
-        for(i = 0; i < 4; i++) {
-          board[0] = new Array(3);
+        function Player() {
+          this.colors = ["red", "blue"];
+          this.index = 0;
+          this.turn = function() {
+            return this.colors[this.index];
+          }
+          this.next = function() {
+            this.index = (this.index + 1) % 2;
+          };
+        }
+
+        function board() {
+          this.state = new Array(3);
+          for(i = 0; i < 4; i++) {
+            this.board[0] = new Array(3);
+          }
         }
 
         var boardX = 0;
         var boardY = 0;
 
-        setInterval(draw,50);
+        var players = new Player();
 
-        document.addEventListener('keydown', function(event) {
+        draw();
+
+        document.addEventListener("keydown", function(event) {
           if(event.keyCode === 37) {
             x -= 210;
             if(x < 30) {
               x = 450;
               boardX = (boardX - 1) % 3;
+              players.next();
             }
           }
           else if(event.keyCode === 38) {
@@ -46,6 +61,10 @@
               boardY = (boardY + 1) % 3;
             }
           }
+          else if(event.keyCode === 13) {
+            players.next();
+          }
+          draw();
         }, true);
 
         function draw(){  
@@ -54,11 +73,18 @@
           if (canvas.getContext){  
             var ctx = canvas.getContext('2d');  
             ctx.clearRect(0,0,canvas.width, canvas.height);
+            drawBoard();
+            drawRect();
+            drawX();
+          }  
+
+          function drawBoard() {
             ctx.strokeStyle = "black";
             ctx.lineWidth = 10;
             ctx.lineCap = "round";
 
             for(i = 1; i < 3; i++) {
+              ctx.beginPath();
               ctx.moveTo(30,i*200 + 30);  
               ctx.lineTo(630,i*200 + 30);  
               ctx.stroke();
@@ -66,19 +92,34 @@
               ctx.lineTo(i*200 + 30, 630);  
               ctx.stroke();
             }
-            drawRect();
-            drawCirc();
-          }  
+          }
+
           function drawRect() {
-            ctx.strokeStyle = player[0];
+            ctx.strokeStyle = players.turn();
             ctx.lineWidth = 5;
+            ctx.beginPath();
             ctx.strokeRect(x,y,180,180);
           }
+
           function drawCirc() {
-            ctx.strokeStyle = player[0];
-            ctx.moveTo(200,130);  
-            ctx.arc(130,130,70,0, Math.PI*2, true);
+            ctx.strokeStyle = 'red'
+            ctx.lineWidth = 15;
+            ctx.beginPath();
+            ctx.arc(120,120,70,0, Math.PI*2, true);
             ctx.stroke();  
+          }
+
+          function drawX() {
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 15;
+            ctx.beginPath();
+            ctx.moveTo(x + 90 + 70, y + 90 + 70);
+            ctx.lineTo(x + 90 - 70, y + 90 - 70);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x + 90 - 70, y + 90 + 70);
+            ctx.lineTo(x + 90 + 70, y + 90 - 70);
+            ctx.stroke();
           }
         }  
       }
