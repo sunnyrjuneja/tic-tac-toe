@@ -9,6 +9,8 @@
         var boardX = 0;
         var boardY = 0;
 
+        var moveCounter = 0;
+
         var board = new Array(3);
         for(i = 0; i < 3; i++) {
           board[i] = new Array(3);
@@ -74,7 +76,13 @@
               if(winner()) {
                 draw();
                 alert('You won!');
-                main();
+                window.location.reload();
+              }
+              moveCounter = moveCounter + 1;
+              if(moveCounter === 9) {
+                draw();
+                alert('Draw!');
+                window.location.reload();
               }
               players.next();
             } else  {
