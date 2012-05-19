@@ -3,8 +3,19 @@
     <title>Tic-Tac-Toe</title>  
     <script type="text/javascript">  
       function main() {
-        var x = 30;
-        var y = 30;
+        var rectX = 30;
+        var rectY = 30;
+
+        var boardX = 0;
+        var boardY = 0;
+
+        var board = new Array(3);
+        for(i = 0; i < 3; i++) {
+          board[i] = new Array(3);
+          for(j = 0; j < 3; j++) {
+            board[i][j] = -1;
+          }
+        }
 
         function Player() {
           this.colors = ["red", "blue"];
@@ -17,55 +28,78 @@
           };
         }
 
-        function board() {
-          this.state = new Array(3);
-          for(i = 0; i < 4; i++) {
-            this.board[0] = new Array(3);
-          }
-        }
-
-        var boardX = 0;
-        var boardY = 0;
-
         var players = new Player();
+
+        var playedMoves = [];
 
         draw();
 
         document.addEventListener("keydown", function(event) {
           if(event.keyCode === 37) {
-            x -= 210;
-            if(x < 30) {
-              x = 450;
-              boardX = (boardX - 1) % 3;
-              players.next();
+            rectX -= 210;
+            boardX -= 1;
+            if(rectX < 30) {
+              rectX = 450;
+              boardX = 2; 
             }
           }
           else if(event.keyCode === 38) {
-            y -= 210;
-            if(y < 30) {
-              y = 450;  
-              boardY = (boardY - 1) % 3;
+            rectY -= 210;
+            boardY -= 1
+            if(rectY < 30) {
+              rectY = 450;  
+              boardY = 2;
             }
           }
           else if(event.keyCode === 39) {
-            x += 210;
-            if(x > 450) {
-              x = 30;
-              boardX = (boardX  + 1) % 3;
+            rectX += 210;
+            boardX += 1;
+            if(rectX > 450) {
+              rectX = 30;
+              boardX = 0;
             }
           }
           else if(event.keyCode === 40) {
-            y += 210;
-            if(y > 450) {
-              y = 30;
-              boardY = (boardY + 1) % 3;
+            rectY += 210;
+            boardY += 1;
+            if(rectY > 450) {
+              rectY = 30;
+              boardY = 0;
             }
           }
           else if(event.keyCode === 13) {
-            players.next();
+            if(board[boardX][boardY] !== 'red' && board[boardX][boardY] !== 'blue') {
+              board[boardX][boardY] = players.turn();
+              playedMoves.push([rectX, rectY, players.turn()]);
+              if(winner()) {
+                draw();
+                alert('You won!');
+                main();
+              }
+              players.next();
+            } else  {
+              alert('Someone already went there!');
+            } 
           }
           draw();
         }, true);
+
+        function winner() {
+          for(i = 0; i < 3; i++) {
+            if((board[i][0] === board[i][1]) && (board[i][1]=== board[i][2]) && (board[i][0] !== -1)) {
+              return true;
+            } else if((board[0][i] === board[1][i]) && (board[1][i]=== board[2][i]) && (board[0][i] !== -1)) {
+              return true;
+            }
+          }
+          if((board[0][0] === board[1][1]) && (board[1][1]=== board[2][2]) && (board[0][0] !== -1)) {
+            return true;
+          } else if((board[0][2] === board[1][1]) && (board[1][1] === board[2][0]) && (board[0][2] !== -1)) {
+            return true;
+          } else {
+            return false;
+          }
+        }
 
         function draw(){  
           var canvas = document.getElementById('tutorial');  
@@ -75,7 +109,7 @@
             ctx.clearRect(0,0,canvas.width, canvas.height);
             drawBoard();
             drawRect();
-            drawX();
+            drawOldMoves();
           }  
 
           function drawBoard() {
@@ -94,22 +128,32 @@
             }
           }
 
+          function drawOldMoves() {
+            for(i = 0; i < playedMoves.length; i++){ 
+              if(playedMoves[i][2] === 'red') {
+                drawCirc(playedMoves[i][0], playedMoves[i][1]);
+              } else {
+                drawX(playedMoves[i][0], playedMoves[i][1]);
+              }
+            }
+          }
+
           function drawRect() {
             ctx.strokeStyle = players.turn();
             ctx.lineWidth = 5;
             ctx.beginPath();
-            ctx.strokeRect(x,y,180,180);
+            ctx.strokeRect(rectX,rectY,180,180);
           }
 
-          function drawCirc() {
+          function drawCirc(x, y) {
             ctx.strokeStyle = 'red'
             ctx.lineWidth = 15;
             ctx.beginPath();
-            ctx.arc(120,120,70,0, Math.PI*2, true);
+            ctx.arc(x + 90,y + 90,70,0, Math.PI*2, true);
             ctx.stroke();  
           }
 
-          function drawX() {
+          function drawX(x, y) {
             ctx.strokeStyle = 'blue';
             ctx.lineWidth = 15;
             ctx.beginPath();
